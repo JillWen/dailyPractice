@@ -1,0 +1,56 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wj.dao.ClassDao">
+
+    <resultMap id="classMap" type="com.wj.po.ClassPO">
+        <id property="id" column="id"/>
+        <result property="name" column="c_name"/>
+    </resultMap>
+
+    <!-- 班级老师一对一映射 -->
+    <resultMap id="classWithTeacherMap" type="com.wj.po.ClassPO" extends="classMap">
+        <association property="teacher" column="t_id" javaType="com.wj.po.Teacher"
+                     resultMap="com.wj.dao.TeacherDao.teacherMap"/>
+    </resultMap>
+
+    <select id="queryClassTeacher" resultMap="classWithTeacherMap">
+        SELECT class.id AS id,
+        class.c_name AS c_name,
+        teacher.id,
+        teacher.t_name AS t_name
+        FROM test.class INNER JOIN test.teacher
+        ON t_id=teacher.id
+        WHERE class.id = #{id}
+    </select>
+
+    <!-- 每个班级都有多个学生 -->
+    <resultMap id="classWithStudentsMap2" type="com.wj.po.ClassPO" extends="classMap">
+        <association property="students"  column="c_id" javaType="com.wj.dao.StudentDao" resultMap="com.wj.dao.StudentDao.studentMap"/>
+    </resultMap>
+
+    <resultMap id="classWithStudentsMap" type="com.wj.po.ClassPO" extends="classMap">
+        <collection property="students" javaType="ArrayList" column="c_id" ofType="com.wj.dao.StudentDao" resultMap="com.wj.dao.StudentDao.studentMap"/>
+    </resultMap>
+
+    <select id="getClassPO" resultMap="classWithStudentsMap" parameterType="String">
+       SELECT c.id AS id,c.c_name as c_name,
+       r.s_id AS s_id,
+       s.s_name AS  s_name
+       FROM class c
+       LEFT JOIN r_class_student r
+       ON c.id = r.c_id
+       LEFT JOIN student s
+       ON r.s_id = s.id
+       WHERE c.id = #{id}
+    </select>
+
+    <select id="getStudents" resultMap="com.wj.dao.StudentDao.studentMap" parameterType="String">
+        SELECT student.id,student.s_name FROM
+        student, r_class_student
+        WHERE student.id = r_class_student.s_id
+        AND r_class_student.c_id = #{id}
+    </select>
+
+
+</mapper>

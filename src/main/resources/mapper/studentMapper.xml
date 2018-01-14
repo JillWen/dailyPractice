@@ -1,0 +1,30 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wj.dao.StudentDao">
+
+    <resultMap id="studentMap" type="com.wj.po.Student">
+        <id property="id" column="s_id" />
+        <result property="name" column="s_name"/>
+    </resultMap>
+
+
+    <select id="queryClassesAttend" resultMap="studentMap">
+        SELECT class.id AS id,
+        class.c_name AS c_name,
+        teacher.id AS id,
+        teacher.t_name AS t_name
+        FROM test.class INNER JOIN test.teacher
+        ON t_id=teacher.id
+        WHERE class.id = #{id}
+    </select>
+
+    <!-- 学生可以参加多个兴趣班 -->
+    <resultMap id="studentWithClassesMap" type="com.wj.po.Student" extends="studentMap">
+        <collection property="classes"  column="id" javaType="ArrayList"
+                    ofType="com.wj.po.ClassPO" jdbcType="VARCHAR" select="com.wj.dao.ClassDao.getClasses"/>
+    </resultMap>
+
+
+
+</mapper>

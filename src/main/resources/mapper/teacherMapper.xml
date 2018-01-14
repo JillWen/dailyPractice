@@ -1,0 +1,22 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wj.dao.TeacherDao">
+    <resultMap id="teacherMap" type="com.wj.po.Teacher">
+        <id property="id" column="id" />
+        <result property="name" column="t_name"/>
+    </resultMap>
+
+    <select id="queryAll" resultType="com.wj.po.Teacher">
+        SELECT *
+        FROM teacher
+    </select>
+
+    <select id="selectTeacherById" resultMap="teacherMap">
+        SELECT *
+        FROM teacher
+        WHERE id = #{id}
+    </select>
+
+
+</mapper>
